@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chatroom</title>
+    <link rel="stylesheet" href="scratch_1.css">
+</head>
+<body>
+    <h1>Realtime Chatroom</h1>
+
+    <!-- Formulier voor het invoeren van gebruikersnaam -->
+    <div id="username-container">
+        <label for="username-input">Kies een gebruikersnaam:</label>
+        <input type="text" id="username-input" placeholder="Voer een naam in..." autocomplete="off" required>
+        <button id="set-username">Bevestig</button>
+    </div>
+
+    <!-- Lijst voor berichten (Verborgen totdat gebruikersnaam is ingesteld) -->
+    <ul id="messages" style="display: none;"></ul>
+
+    <!-- Formulier voor het invoeren van berichten -->
+    <form id="chat-form" style="display: none;">
+        <input type="text" id="message-input" placeholder="Typ hier je bericht..." autocomplete="off" required>
+        <button type="submit">Verstuur</button>
+    </form>
+
+    <!-- Voeg de Firebase SDK's toe -->
+    <script type="module">
+      // Import de benodigde functies van Firebase
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+      import { getDatabase, ref, set, onChildAdded, push } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+      // Firebase-configuratie
+      const firebaseConfig = {
+        apiKey: "AIzaSyCk8GqEbhJ82udp-wt4guwdwy-adP8xWcc",
+        authDomain: "chatten-b4320.firebaseapp.com",
+        databaseURL: "https://chatten-b4320-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "chatten-b4320",
+        storageBucket: "chatten-b4320.firebasestorage.app",
+        messagingSenderId: "1023014427499",
+        appId: "1:1023014427499:web:ffc0aa9e2eda0a7ad6ca2e",
+        measurementId: "G-09QQ7WF0XD"
+      };
+
+      // Initialiseer Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // Referentie naar berichten in de Realtime Database
+      const messagesRef = ref(database, 'messages');
+
+      // Variabele voor de gebruikersnaam
+      let username = "";
+
+      // Event listener voor het instellen van de gebruikersnaam
+      document.getElementById("set-username").addEventListener("click", function() {
+        const usernameInput = document.getElementById("username-input");
+        username = usernameInput.value.trim();
+
+        if (username) {
+          // Verberg het gebruikersnaamformulier en toon het chatformulier
+          document.getElementById("username-container").style.display = "none";
+          document.getElementById("chat-form").style.display = "block";
+          document.getElementById("messages").style.display = "block";
+        } else {
+          alert("Voer een geldige gebruikersnaam in.");
+        }
+      });
+
+      // Haal berichten op in real-time en voeg ze toe aan de lijst
+      onChildAdded(messagesRef, function(snapshot) {
+        const messageData = snapshot.val();
+        const li = document.createElement("li");
+        li.textContent = `${messageData.username}: ${messageData.message}`;
+        document.getElementById("messages").appendChild(li);
+      });
+
+      // Verstuur een bericht
+      document.getElementById("chat-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const messageInput = document.getElementById("message-input");
+        const message = messageInput.value.trim();
+
+        if (message && username) {
+          // Voeg het bericht toe aan de database samen met de gebruikersnaam
+          const newMessageRef = push(messagesRef); // Genereert automatisch een unieke ID
+          set(newMessageRef, {
+            username: username,  // Voeg de gebruikersnaam toe
+            message: message,
+            timestamp: Date.now()
+          }).then(() => {
+            messageInput.value = ""; // Maak het invoerveld leeg
+          }).catch((error) => {
+            console.error("Error bij het versturen van bericht:", error);
+          });
+        }
+      });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chatroom</title>
+    <link rel="stylesheet" href="scratch_1.css">
+</head>
+<body>
+    <h1>Realtime Chatroom</h1>
+
+    <!-- Formulier voor het invoeren van gebruikersnaam -->
+    <div id="username-container">
+        <label for="username-input">Kies een gebruikersnaam:</label>
+        <input type="text" id="username-input" placeholder="Voer een naam in..." autocomplete="off" required>
+        <button id="set-username">Bevestig</button>
+    </div>
+
+    <!-- Lijst voor berichten (Verborgen totdat gebruikersnaam is ingesteld) -->
+    <ul id="messages" style="display: none;"></ul>
+
+    <!-- Formulier voor het invoeren van berichten -->
+    <form id="chat-form" style="display: none;">
+        <input type="text" id="message-input" placeholder="Typ hier je bericht..." autocomplete="off" required>
+        <button type="submit">Verstuur</button>
+    </form>
+
+    <!-- Voeg de Firebase SDK's toe -->
+    <script src="script.js"></script>
+</body>
+</html>
